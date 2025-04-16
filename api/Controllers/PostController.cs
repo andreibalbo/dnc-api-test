@@ -22,9 +22,9 @@ namespace DncApiTest.Controllers
             return Ok(_repository.GetAll());
         }
 
-        // GET: api/post/5
+        // GET: api/post/{id}
         [HttpGet("{id}")]
-        public ActionResult<Post> GetById(int id)
+        public ActionResult<Post> GetById(Guid id)
         {
             var post = _repository.GetById(id);
             if (post == null) return NotFound();
@@ -41,7 +41,7 @@ namespace DncApiTest.Controllers
 
         // PUT: api/post/5
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Post post)
+        public IActionResult Update(Guid id, Post post)
         {
             var updatedPost = _repository.Update(id, post);
             if (updatedPost == null) return NotFound();
@@ -50,7 +50,7 @@ namespace DncApiTest.Controllers
 
         // DELETE: api/post/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(Guid id)
         {
             if (!_repository.Delete(id)) return NotFound();
             return NoContent();

@@ -7,7 +7,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-builder.Services.AddSingleton<PostRepository>();
+builder.Services.AddSingleton<PostRepository>(sp => 
+    new PostRepository(sp.GetRequiredService<IConfiguration>()));
+
+// Add CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
@@ -17,6 +29,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Add UseCors before routing middleware
+app.UseCors();
 
 // Remove HTTPS redirection
 // app.UseHttpsRedirection();
