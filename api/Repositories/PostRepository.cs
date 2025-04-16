@@ -17,22 +17,17 @@ namespace DncApiTest.Repositories
         public IEnumerable<Post> GetAll() => 
             _posts.Find(post => true).ToList();
 
-        public Post? GetById(int id) => 
+        public Post? GetById(Guid id) => 
             _posts.Find(post => post.Id == id).FirstOrDefault();
 
         public Post Create(Post post)
         {
-            // Find the maximum ID and increment by 1
-            var maxId = _posts.Find(p => true)
-                .SortByDescending(p => p.Id)
-                .FirstOrDefault()?.Id ?? 0;
-            post.Id = maxId + 1;
-            
+            post.Id = Guid.NewGuid();
             _posts.InsertOne(post);
             return post;
         }
 
-        public Post? Update(int id, Post post)
+        public Post? Update(Guid id, Post post)
         {
             post.Id = id; // Ensure the ID matches
             var result = _posts.ReplaceOne(p => p.Id == id, post);
@@ -40,7 +35,7 @@ namespace DncApiTest.Repositories
             return result.ModifiedCount > 0 ? post : null;
         }
 
-        public bool Delete(int id)
+        public bool Delete(Guid id)
         {
             var result = _posts.DeleteOne(post => post.Id == id);
             return result.DeletedCount > 0;

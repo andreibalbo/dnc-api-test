@@ -6,8 +6,8 @@ namespace DncApiTest.Models
     public class Post
     {
         [BsonId]
-        [BsonRepresentation(BsonType.Int32)]
-        public int Id { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public Guid Id { get; set; }
 
         [BsonElement("Title")]
         public string Title { get; set; } = string.Empty;
