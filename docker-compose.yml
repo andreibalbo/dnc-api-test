@@ -2,17 +2,42 @@ version: '3.8'
 
 services:
   api:
+    build:
+      context: ./teamdraft_app
+      dockerfile: Dockerfile
     container_name: api
     command: sleep infinity
-    build: 
-      context: .
-      dockerfile: Dockerfile
     volumes:
-      - ./:/app
+      - ./api/:/app
     ports:
       - "5002:5002"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5002
     tty: true 
-    
+    depends_on:
+      - mongodb
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: web
+    command: sleep infinity
+    volumes:
+      - ./web:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
