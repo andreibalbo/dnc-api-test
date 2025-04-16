@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { postService } from '@/services/api';
+import { postService } from '@/services/api'
 
 export default {
   name: 'Posts',
@@ -47,64 +47,64 @@ export default {
       },
       editMode: false,
       editId: null
-    };
+    }
   },
   async created() {
-    await this.loadPosts();
+    await this.loadPosts()
   },
   methods: {
     async loadPosts() {
       try {
-        const response = await postService.getAll();
-        this.posts = response.data;
+        const response = await postService.getAll()
+        this.posts = response.data
       } catch (error) {
-        console.error('Error loading posts:', error);
+        console.error('Error loading posts:', error)
       }
     },
     async submitPost() {
       try {
         if (this.editMode) {
-          await postService.update(this.editId, this.form);
+          await postService.update(this.editId, this.form)
         } else {
-          await postService.create(this.form);
+          await postService.create(this.form)
         }
-        this.resetForm();
-        await this.loadPosts();
+        this.resetForm()
+        await this.loadPosts()
       } catch (error) {
-        console.error('Error submitting post:', error);
+        console.error('Error submitting post:', error)
       }
     },
     editPost(post) {
-      this.editMode = true;
-      this.editId = post.id;
+      this.editMode = true
+      this.editId = post.id
       this.form = {
         title: post.title,
         content: post.content
-      };
+      }
     },
     async deletePost(id) {
       if (confirm('Are you sure you want to delete this post?')) {
         try {
-          await postService.delete(id);
-          await this.loadPosts();
+          await postService.delete(id)
+          await this.loadPosts()
         } catch (error) {
-          console.error('Error deleting post:', error);
+          console.error('Error deleting post:', error)
         }
       }
     },
     cancelEdit() {
-      this.resetForm();
+      this.resetForm()
     },
     resetForm() {
       this.form = {
         title: '',
         content: ''
-      };
-      this.editMode = false;
-      this.editId = null;
+      }
+      this.editMode = false
+      this.editId = null
     }
   }
-};
+}
 </script>
 
 <style scoped>
