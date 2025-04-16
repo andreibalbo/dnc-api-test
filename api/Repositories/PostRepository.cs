@@ -1,40 +1,49 @@
+using MongoDB.Driver;
 using DncApiTest.Models;
 
 namespace DncApiTest.Repositories
 {
     public class PostRepository
     {
-        private readonly List<Post> _posts = new();
-        private int _nextId = 1;
+        private readonly IMongoCollection<Post> _posts;
 
-        public IEnumerable<Post> GetAll() => _posts;
+        public PostRepository(IConfiguration configuration)
+        {
+            var mongoClient = new MongoClient(configuration.GetValue<string>("MongoDB:ConnectionString") ?? "mongodb://mongodb:27017");
+            var database = mongoClient.GetDatabase(configuration.GetValue<string>("MongoDB:DatabaseName") ?? "blogdb");
+            _posts = database.GetCollection<Post>("Posts");
+        }
 
-        public Post? GetById(int id) => _posts.FirstOrDefault(p => p.Id == id);
+        public IEnumerable<Post> GetAll() => 
+            _posts.Find(post => true).ToList();
+
+        public Post? GetById(int id) => 
+            _posts.Find(post => post.Id == id).FirstOrDefault();
 
         public Post Create(Post post)
         {
-            post.Id = _nextId++;
-            _posts.Add(post);
+            // Find the maximum ID and increment by 1
+            var maxId = _posts.Find(p => true)
+                .SortByDescending(p => p.Id)
+                .FirstOrDefault()?.Id ?? 0;
+            post.Id = maxId + 1;
+            
+            _posts.InsertOne(post);
             return post;
         }
 
         public Post? Update(int id, Post post)
         {
-            var existingPost = _posts.FirstOrDefault(p => p.Id == id);
-            if (existingPost == null) return null;
-
-            existingPost.Title = post.Title;
-            existingPost.Content = post.Content;
-            return existingPost;
+            post.Id = id; // Ensure the ID matches
+            var result = _posts.ReplaceOne(p => p.Id == id, post);
+            
+            return result.ModifiedCount > 0 ? post : null;
         }
 
         public bool Delete(int id)
         {
-            var post = _posts.FirstOrDefault(p => p.Id == id);
-            if (post == null) return false;
-
-            _posts.Remove(post);
-            return true;
+            var result = _posts.DeleteOne(post => post.Id == id);
+            return result.DeletedCount > 0;
         }
     }
 } 

@@ -7,7 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-builder.Services.AddSingleton<PostRepository>();
+builder.Services.AddSingleton<PostRepository>(sp => 
+    new PostRepository(sp.GetRequiredService<IConfiguration>()));
 
 // Add CORS configuration
 builder.Services.AddCors(options =>
